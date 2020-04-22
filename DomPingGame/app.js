@@ -9,7 +9,8 @@ GAME RULES:
 
 */
 
-var players, playerTurn=0, score=0; //currentRoll=0
+//gamePlaying is a state variable indicating if the game is still oging on or not
+var players, playerTurn=0, score=0, gamePlaying=true; //currentRoll=0
 
 function Player(){
     this.roundScore=0;
@@ -39,44 +40,55 @@ function changeTurn(){
 players=[new Player(),new Player()];
 
 
-//SET THE NAME IN STARTING STATE
-document.getElementsByClassName("btn-new")[0].addEventListener("click",  function() {
-    players[0].setAllToZero();
-    players[1].setAllToZero();
-    document.getElementById("current-0").innerHTML= players[0].totalScore.toString();
-    document.getElementById("current-1").innerHTML= players[0].totalScore.toString();
-    document.getElementById("score-0").innerHTML= players[0].roundScore.toString();
-    document.getElementById("score-1").innerHTML= players[0].roundScore.toString();
-    currentRoll=0;
-    console.log('new game');
+//SET THE GAME IN STARTING STATE
+document.querySelector(".btn-new").addEventListener("click",  function() {
+    if(gamePlaying){
+        players[0].setAllToZero();
+        players[1].setAllToZero();
+        document.getElementById("current-0").innerHTML= players[0].totalScore.toString();
+        document.getElementById("current-1").innerHTML= players[0].totalScore.toString();
+        document.getElementById("score-0").innerHTML= players[0].roundScore.toString();
+        document.getElementById("score-1").innerHTML= players[0].roundScore.toString();
+        currentRoll=0;
+    }
+    
 } )
 
 //ROLL BUTTON LOGIC
-document.getElementsByClassName("btn-roll")[0].addEventListener("click", function() {
-    score= Math.floor(Math.random()*6)+1;
-    document.getElementsByClassName("dice")[0].setAttribute('src','dice-'+score+'.png');
-    if(score!==1){
-            players[playerTurn].roundScore+=score;
-            document.getElementById("current-"+playerTurn).innerHTML=players[playerTurn].roundScore;
+document.querySelector(".btn-roll").addEventListener('click', function() {
+    console.log(gamePlaying);
+    if(gamePlaying){
+                score= Math.floor(Math.random()*6)+1;
+                document.getElementsByClassName("dice")[0].setAttribute('src','dice-'+score+'.png');
+                if(score!==1){
+                        players[playerTurn].roundScore+=score;
+                        document.getElementById("current-"+playerTurn).innerHTML=players[playerTurn].roundScore;
+                }
+                else{
+                        players[playerTurn].roundScore=0;
+                        document.getElementById("current-"+playerTurn).innerHTML=players[playerTurn].roundScore;
+                        changeTurn();
+                    }
     }
-    else{
-            players[playerTurn].roundScore=0;
-            document.getElementById("current-"+playerTurn).innerHTML=players[playerTurn].roundScore;
-            changeTurn();
-    }
-    console.log('roll dice');
 });
 
 
 //HOLD BUTTON LOGIC
-document.getElementsByClassName('btn-hold')[0].addEventListener('click', function() {
-    players[playerTurn].totalScore=players[playerTurn].totalScore+players[playerTurn].roundScore;
-    document.getElementById('score-'+playerTurn).innerHTML=players[playerTurn].totalScore;
-    document.getElementById('current-'+playerTurn).innerHTML=0;
-    players[playerTurn].roundScore=0;
-    console.log("before: ", playerTurn)
-    changeTurn();
-    console.log("after: ", playerTurn)
-    console.log('hold score');
+document.querySelector('.btn-hold').addEventListener('click', function() {
+   if(gamePlaying){ 
+                players[playerTurn].totalScore=players[playerTurn].totalScore+players[playerTurn].roundScore;
+                if(players[playerTurn].totalScore>=10){
+                            document.getElementById('name-'+playerTurn).textContent="WINNER!";
+                            document.querySelector('.dice').style.display = 'none';
+                            document.getElementById('name-'+playerTurn).setAttribute('class','winner player-name');
+                            document.querySelector('.player-'+playerTurn+'-panel').classList.add('winner');
+                            document.querySelector('.player-'+playerTurn+'-panel').classList.add('active');
+                            gamePlaying=false;
+                        }
+                document.getElementById('score-'+playerTurn).innerHTML=players[playerTurn].totalScore;
+                document.getElementById('current-'+playerTurn).innerHTML=0;
+                players[playerTurn].roundScore=0;
+                changeTurn();
+            }
     
 })
