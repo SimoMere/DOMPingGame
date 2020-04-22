@@ -1,12 +1,10 @@
 /*
 GAME RULES:
-
 - The game has 2 players, playing in rounds
 - In each turn, a player rolls a dice as many times as he whishes. Each result get added to his ROUND score
 - BUT, if the player rolls a 1, all his ROUND score gets lost. After that, it's the next player's turn
 - The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
 - The first player to reach 100 points on GLOBAL score wins the game
-
 */
 
 //gamePlaying is a state variable indicating if the game is still oging on or not
@@ -42,7 +40,15 @@ players=[new Player(),new Player()];
 
 //SET THE GAME IN STARTING STATE
 document.querySelector(".btn-new").addEventListener("click",  function() {
-    if(gamePlaying){
+        if(gamePlaying===false){
+            document.querySelector('.player-'+playerTurn+'-panel').classList.remove('winner');
+            document.getElementById('name-'+playerTurn).textContent="Player "+(playerTurn+1);
+            document.querySelector('.dice').style.display = 'inline-block';
+            document.querySelector('.player-'+playerTurn+'-panel').classList.remove('active');
+            changeTurn();
+            document.querySelector('.player-'+playerTurn+'-panel').classList.add('active');
+            gamePlaying=true;
+        }
         players[0].setAllToZero();
         players[1].setAllToZero();
         document.getElementById("current-0").innerHTML= players[0].totalScore.toString();
@@ -50,7 +56,7 @@ document.querySelector(".btn-new").addEventListener("click",  function() {
         document.getElementById("score-0").innerHTML= players[0].roundScore.toString();
         document.getElementById("score-1").innerHTML= players[0].roundScore.toString();
         currentRoll=0;
-    }
+ 
     
 } )
 
@@ -67,7 +73,9 @@ document.querySelector(".btn-roll").addEventListener('click', function() {
                 else{
                         players[playerTurn].roundScore=0;
                         document.getElementById("current-"+playerTurn).innerHTML=players[playerTurn].roundScore;
+                        document.querySelector('.player-'+playerTurn+'-panel').classList.remove('active');
                         changeTurn();
+                        document.querySelector('.player-'+playerTurn+'-panel').classList.add('active');
                     }
     }
 });
@@ -77,18 +85,24 @@ document.querySelector(".btn-roll").addEventListener('click', function() {
 document.querySelector('.btn-hold').addEventListener('click', function() {
    if(gamePlaying){ 
                 players[playerTurn].totalScore=players[playerTurn].totalScore+players[playerTurn].roundScore;
-                if(players[playerTurn].totalScore>=10){
+                if(players[playerTurn].totalScore>=100){
                             document.getElementById('name-'+playerTurn).textContent="WINNER!";
                             document.querySelector('.dice').style.display = 'none';
-                            document.getElementById('name-'+playerTurn).setAttribute('class','winner player-name');
                             document.querySelector('.player-'+playerTurn+'-panel').classList.add('winner');
-                            document.querySelector('.player-'+playerTurn+'-panel').classList.add('active');
+                            document.querySelector('.player-'+playerTurn+'-panel').classList.remove('active');
                             gamePlaying=false;
+                            document.getElementById('score-'+playerTurn).innerHTML=players[playerTurn].totalScore;
+                            document.getElementById('current-'+playerTurn).innerHTML=0;
+                            players[playerTurn].roundScore=0;
                         }
-                document.getElementById('score-'+playerTurn).innerHTML=players[playerTurn].totalScore;
-                document.getElementById('current-'+playerTurn).innerHTML=0;
-                players[playerTurn].roundScore=0;
-                changeTurn();
+                else{
+                            document.getElementById('score-'+playerTurn).innerHTML=players[playerTurn].totalScore;
+                            document.getElementById('current-'+playerTurn).innerHTML=0;
+                            players[playerTurn].roundScore=0;
+                            document.querySelector('.player-'+playerTurn+'-panel').classList.remove('active');
+                            changeTurn();
+                            document.querySelector('.player-'+playerTurn+'-panel').classList.add('active');
+                }
             }
     
 })
